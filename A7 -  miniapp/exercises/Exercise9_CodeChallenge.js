@@ -65,16 +65,62 @@ export default function Exercise9_CodeChallenge() {
     return code
       .replace(/\s+/g, '') // Remove espaços
       .replace(/"/g, "'") // Normaliza aspas
+      .replace(/;$/g, '') // Remove ponto e vírgula final
+      .replace(/>texto<\/text>/gi, '>texto</text>') // Normaliza texto
+      .replace(/>clique<\/text>/gi, '>clique</text>') // Normaliza texto clique
       .toLowerCase();
   };
 
-  const checkAnswer = () => {
+  const checkCodeMatch = (userCode, expectedCode) => {
     const normalizedUser = normalizeCode(userCode);
-    const normalizedExpected = normalizeCode(challenge.expectedCode);
+    const normalizedExpected = normalizeCode(expectedCode);
+    
+    // Verifica correspondência exata primeiro
+    if (normalizedUser === normalizedExpected) return true;
+    
+    // Verificações flexíveis por desafio
+    const challenge = CHALLENGES[currentChallenge];
+    
+    // Para o desafio da View azul, verifica se contém os elementos essenciais
+    if (challenge.id === 1) {
+      return normalizedUser.includes('view') &&
+             normalizedUser.includes('width:100') &&
+             normalizedUser.includes('height:100') &&
+             (normalizedUser.includes("backgroundcolor:'#2196f3'") || normalizedUser.includes('backgroundcolor:\'#2196f3\''));
+    }
+    
+    // Para useState
+    if (challenge.id === 2) {
+      return normalizedUser.includes('const[count,setcount]=usestate(0)');
+    }
+    
+    // Para Text estilizado
+    if (challenge.id === 3) {
+      return normalizedUser.includes('text') &&
+             (normalizedUser.includes("color:'white'") || normalizedUser.includes('color:\'white\'')) &&
+             normalizedUser.includes('fontsize:20') &&
+             (normalizedUser.includes("fontweight:'bold'") || normalizedUser.includes('fontweight:\'bold\''));
+    }
+    
+    // Para TouchableOpacity
+    if (challenge.id === 4) {
+      return normalizedUser.includes('touchableopacity') &&
+             normalizedUser.includes('onpress={handlepress}');
+    }
+    
+    // Para useEffect
+    if (challenge.id === 5) {
+      return normalizedUser.includes('useeffect') &&
+             normalizedUser.includes('[],')  || normalizedUser.includes('[])');
+    }
+    
+    return false;
+  };
 
+  const checkAnswer = () => {
     setAttempts(attempts + 1);
 
-    if (normalizedUser === normalizedExpected) {
+    if (checkCodeMatch(userCode, challenge.expectedCode)) {
       setSolved([...solved, challenge.id]);
       Alert.alert(
         '🎉 Correto!',

@@ -49,10 +49,11 @@ export default function Exercise8_Advanced() {
   };
 
   const generateBoxes = () => {
+    const targetIndex = Math.floor(Math.random() * 6);
     const newBoxes = Array.from({ length: 6 }, (_, i) => ({
       id: i,
-      isTarget: i === Math.floor(Math.random() * 6),
-      color: i === Math.floor(Math.random() * 6) ? '#4CAF50' : '#6C8CFF',
+      isTarget: i === targetIndex,
+      color: i === targetIndex ? '#4CAF50' : '#6C8CFF',
     }));
     setBoxes(newBoxes);
   };
